@@ -13,7 +13,7 @@
       >
         <ul
           class="flex w-full gap-4 overflow-auto px-2 sm:grid sm:grid-cols-2 sm:gap-2 md:grid-cols-3 lg:grid-cols-4 [&::-webkit-scrollbar]:hidden"
-          v-auto-animate
+          v-auto-animate="{ duration: 700 }"
         >
           <li
             v-for="product in productsStore.products"
