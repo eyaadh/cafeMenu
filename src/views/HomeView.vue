@@ -36,7 +36,11 @@
                 </h3>
               </div>
               <div class="mt-4 flex items-center gap-2">
-                <CurrencyDollarIcon class="mb-1 h-4" />
+                <div
+                  class="mb-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white text-gray-900"
+                >
+                  <IconMVRF class="h-1.5" />
+                </div>
                 <p class="text-xs">Price: {{ product.price }}</p>
               </div>
             </div>
@@ -81,13 +85,10 @@
 <script setup lang="ts">
 import BrandLogo from "@/components/BrandLogo.vue";
 import { useProductsStore } from "@/stores/useProductsStore";
-import {
-  CurrencyDollarIcon,
-  MapIcon,
-  DevicePhoneMobileIcon,
-} from "@heroicons/vue/20/solid";
+import { MapIcon, DevicePhoneMobileIcon } from "@heroicons/vue/20/solid";
 import IconViber from "@/components/icons/IconViber.vue";
 import IconFacebook from "@/components/icons/IconFacebook.vue";
+import IconMVRF from "@/components/icons/IconMVRF.vue";
 
 const productsStore = useProductsStore();
 </script>

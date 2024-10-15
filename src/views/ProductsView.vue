@@ -45,11 +45,30 @@
                           active
                             ? 'bg-gray-100/80 text-gray-900'
                             : 'text-white',
-                          'flex w-full justify-between border-b border-white/10 px-4 py-2 text-sm',
+                          'flex w-full items-center justify-start gap-2 border-b border-white/10 px-4 py-2 text-sm',
                         ]"
                       >
+                        <PlusCircleIcon
+                          class="mb-1 h-4 w-4"
+                          aria-hidden="true"
+                        />
                         <span class="drop-shadow">Add</span>
                       </button>
+                    </MenuItem>
+
+                    <MenuItem v-slot="{ active }">
+                      <RouterLink
+                        to="/"
+                        :class="[
+                          active
+                            ? 'bg-gray-100/80 text-gray-900'
+                            : 'text-white',
+                          'flex w-full items-center justify-start gap-2 px-4 py-2 text-sm',
+                        ]"
+                      >
+                        <HomeIcon class="mb-1 h-4 w-4" aria-hidden="true" />
+                        <span class="drop-shadow">Customer View</span>
+                      </RouterLink>
                     </MenuItem>
 
                     <MenuItem v-slot="{ active }">
@@ -59,9 +78,10 @@
                           active
                             ? 'bg-gray-100/80 text-gray-900'
                             : 'text-white',
-                          'flex w-full justify-between px-4 py-2 text-sm',
+                          'flex w-full items-center justify-start gap-2 border-b border-white/10 px-4 py-2 text-sm',
                         ]"
                       >
+                        <QrCodeIcon class="mb-1 h-4 w-4" aria-hidden="true" />
                         <span class="drop-shadow">Show my QR</span>
                       </button>
                     </MenuItem>
@@ -74,9 +94,13 @@
                           active
                             ? 'bg-gray-100/80 text-gray-900'
                             : 'text-white',
-                          'flex w-full justify-between px-4 py-2 text-sm',
+                          'flex w-full items-center justify-start gap-2 px-4 py-2 text-sm',
                         ]"
                       >
+                        <ArrowLeftStartOnRectangleIcon
+                          class="mb-1 h-4 w-4"
+                          aria-hidden="true"
+                        />
                         <span class="drop-shadow">Sing Out</span>
                       </button>
                     </MenuItem>
@@ -118,7 +142,11 @@
                   </h3>
                 </div>
                 <div class="mt-4 flex items-center gap-2">
-                  <CurrencyDollarIcon class="mb-1 h-4" />
+                  <div
+                    class="mb-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white text-gray-900"
+                  >
+                    <IconMVRF class="h-1.5" />
+                  </div>
                   <p class="text-xs">Price: {{ product.price }}</p>
                 </div>
               </div>
@@ -265,9 +293,12 @@
 <script setup lang="ts">
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import {
-  CurrencyDollarIcon,
+  PlusCircleIcon,
+  QrCodeIcon,
+  HomeIcon,
   EllipsisVerticalIcon,
   PhotoIcon,
+  ArrowLeftStartOnRectangleIcon,
 } from "@heroicons/vue/20/solid";
 import { useAuth } from "@/composables/useAuth";
 import ThemeDialog from "@/components/ThemeDialog.vue";
@@ -277,6 +308,7 @@ import useVuelidate from "@vuelidate/core";
 import { useProductsStore } from "@/stores/useProductsStore";
 import type { IProduct } from "@/types/Products";
 import { PencilSquareIcon } from "@heroicons/vue/24/solid";
+import IconMVRF from "@/components/icons/IconMVRF.vue";
 
 const { signOutUser } = useAuth();
 const productsDialog = ref<typeof ThemeDialog | null>(null);
