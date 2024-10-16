@@ -117,7 +117,7 @@
                           class="mb-1 h-4 w-4"
                           aria-hidden="true"
                         />
-                        <span class="drop-shadow">Sing Out</span>
+                        <span class="drop-shadow">Sign Out</span>
                       </button>
                     </MenuItem>
                   </div>
