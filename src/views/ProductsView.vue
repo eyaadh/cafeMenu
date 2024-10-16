@@ -52,7 +52,23 @@
                           class="mb-1 h-4 w-4"
                           aria-hidden="true"
                         />
-                        <span class="drop-shadow">Add</span>
+                        <span class="drop-shadow">Add Products</span>
+                      </button>
+                    </MenuItem>
+
+                    <MenuItem v-slot="{ active }">
+                      <button
+                        @click="openCategoriesDialog"
+                        type="button"
+                        :class="[
+                          active
+                            ? 'bg-gray-100/80 text-gray-900'
+                            : 'text-white',
+                          'flex w-full items-center justify-start gap-2 border-b border-white/10 px-4 py-2 text-sm',
+                        ]"
+                      >
+                        <TagIcon class="mb-1 h-4 w-4" aria-hidden="true" />
+                        <span class="drop-shadow">Manage Categories</span>
                       </button>
                     </MenuItem>
 
@@ -111,43 +127,52 @@
           </div>
         </div>
       </div>
-      <div class="h-full w-full overflow-auto">
-        <div class="mx-auto overflow-hidden py-8">
+      <div class="h-full w-full overflow-auto [&::-webkit-scrollbar]:hidden">
+        <div class="mx-auto overflow-hidden py-8" v-auto-animate>
           <div
-            v-auto-animate
-            class="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4"
+            class="mt-6 h-full w-full"
+            v-for="category in categoriesStore.categories"
           >
+            <div class="flex gap-2 border-b border-white/5">
+              <HashtagIcon class="h-4 w-4" />
+              <h2 class="font-semibold">{{ category.name }}</h2>
+            </div>
             <div
-              v-for="product in productsStore.products"
-              :key="product.id ? product.id : new Date().getTime()"
-              class="group relative overflow-hidden rounded-md border border-white/10 py-4 shadow-md sm:py-6"
-              @click="loadEditData(product)"
+              class="mt-4 grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4"
             >
-              <div class="absolute right-1 top-1">
-                <PencilSquareIcon class="h-3 w-3" />
-              </div>
               <div
-                class="aspect-h-1 aspect-w-1 -mt-4 overflow-hidden bg-gray-200 group-hover:opacity-75 sm:-mt-6"
+                v-for="product in productsStore.groupItemsByCategory(category)
+                  .value"
+                :key="product.id ? product.id : new Date().getTime()"
+                class="group relative overflow-hidden rounded-md border border-white/10 py-4 shadow-md sm:py-6"
+                @click="loadEditData(product)"
               >
-                <img
-                  :src="product.image ? product.image : ''"
-                  :alt="product.name ? product.name : ''"
-                  class="h-44 w-full object-cover object-center"
-                />
-              </div>
-              <div class="px-4 pt-4">
-                <div class="-mx-4 -mt-4 bg-white/10 px-4 pb-2 pt-4">
-                  <h3 class="line-clamp-2 h-10 text-sm font-medium">
-                    {{ product.name }}
-                  </h3>
+                <div class="absolute right-1 top-1">
+                  <PencilSquareIcon class="h-3 w-3" />
                 </div>
-                <div class="mt-4 flex items-center gap-2">
-                  <div
-                    class="mb-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white text-gray-900"
-                  >
-                    <IconMVRF class="h-1.5" />
+                <div
+                  class="aspect-h-1 aspect-w-1 -mt-4 overflow-hidden bg-gray-200 group-hover:opacity-75 sm:-mt-6"
+                >
+                  <img
+                    :src="product.image ? product.image : ''"
+                    :alt="product.name ? product.name : ''"
+                    class="h-44 w-full object-cover object-center"
+                  />
+                </div>
+                <div class="px-4 pt-4">
+                  <div class="-mx-4 -mt-4 bg-white/10 px-4 pb-2 pt-4">
+                    <h3 class="line-clamp-2 h-10 text-sm font-medium">
+                      {{ product.name }}
+                    </h3>
                   </div>
-                  <p class="text-xs">Price: {{ product.price }}</p>
+                  <div class="mt-4 flex items-center gap-2">
+                    <div
+                      class="mb-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white text-gray-900"
+                    >
+                      <IconMVRF class="h-1.5" />
+                    </div>
+                    <p class="text-xs">Price: {{ product.price }}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -176,7 +201,12 @@
               type="text"
               name="product-name"
               id="product-name"
-              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              :class="
+                productFormValidation.name.$error
+                  ? 'ring-red-300'
+                  : 'ring-gray-300'
+              "
+              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               placeholder="Name of the product"
             />
           </div>
@@ -199,11 +229,24 @@
               type="number"
               name="product-price"
               id="product-price"
-              class="block w-full rounded-md border-0 py-1.5 pl-12 pr-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              :class="
+                productFormValidation.name.$error
+                  ? 'ring-red-300'
+                  : 'ring-gray-300'
+              "
+              class="block w-full rounded-md border-0 py-1.5 pl-12 pr-2 text-gray-900 ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               placeholder="0.00"
               aria-describedby="price-currency"
             />
           </div>
+        </div>
+        <div class="col-span-full">
+          <ThemeCombobox
+            label="Category"
+            :items="categoriesStore.categories"
+            :validation-error="productFormValidation.category.$error"
+            v-model="productForm.category"
+          />
         </div>
         <div class="col-span-full">
           <label
@@ -213,7 +256,12 @@
             Product Image
           </label>
           <div
-            class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
+            :class="
+              productFormValidation.image.$error
+                ? 'border-red-300'
+                : 'border-gray-900/25'
+            "
+            class="mt-2 flex justify-center rounded-lg border border-dashed px-6 py-10"
           >
             <div v-if="!productForm.image" class="text-center">
               <PhotoIcon
@@ -266,7 +314,7 @@
         type="button"
         :class="productForm.id ? '' : 'sm:col-start-2'"
         class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        @click="saveDoc"
+        @click="saveProduct"
       >
         Save
       </button>
@@ -288,6 +336,93 @@
       </button>
     </template>
   </ThemeDialog>
+
+  <ThemeDialog
+    @dialog-close="closeCategoriesDialog"
+    title="Categories Management"
+    ref="categoriesDialog"
+  >
+    <template #body>
+      <div
+        v-if="categoryRemoveError"
+        class="animate-fade-down animate-duration-700 border-l-4 border-red-400 bg-red-50 p-4"
+      >
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <ExclamationTriangleIcon
+              class="h-5 w-5 text-red-400"
+              aria-hidden="true"
+            />
+          </div>
+          <div class="ml-3 text-start">
+            <p class="text-[13px] text-red-700">
+              This category cannot be removed, there are items associated with
+              it.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 flex h-full w-full flex-col">
+        <div class="flex w-full justify-end">
+          <div class="flex w-full flex-col items-start">
+            <label
+              for="category-name"
+              class="block text-sm font-medium leading-6 text-gray-900"
+            >
+              Category Name
+            </label>
+            <div class="relative isolate w-full">
+              <input
+                v-model="categoryForm.name"
+                type="text"
+                name="category-name"
+                id="category-name"
+                :class="
+                  categoryFormValidation.name.$error
+                    ? 'ring-red-300'
+                    : 'ring-gray-300'
+                "
+                class="block w-full rounded-md border-0 py-1.5 pr-16 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                placeholder="Name of the category"
+              />
+              <button
+                class="absolute right-0 top-0 flex h-full gap-2 rounded-r-md px-2 pb-0 pt-3 text-xs ring-1 ring-inset ring-gray-300 hover:text-gray-500"
+                @click="saveCategory()"
+              >
+                <CheckCircleIcon class="h-3 w-3" />
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 w-full">
+          <ul class="flex w-full flex-col gap-2" v-auto-animate>
+            <li
+              class="flex w-full items-center justify-between border-b py-1"
+              v-for="category in categoriesStore.categories"
+            >
+              <div class="flex items-center gap-2">
+                <span class="text-sm">{{ category.name }}</span>
+                <span
+                  class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 pb-px text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
+                >
+                  {{ productsStore.countByCategory(category.id) }}
+                </span>
+              </div>
+              <div class="flex gap-2">
+                <button @click="loadCategoryEdit(category)">
+                  <PencilSquareIcon class="h-3 hover:text-gray-500" />
+                </button>
+                <button @click="deleteCategory(category)">
+                  <TrashIcon class="h-3 hover:text-gray-500" />
+                </button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </template>
+  </ThemeDialog>
 </template>
 
 <script setup lang="ts">
@@ -299,6 +434,11 @@ import {
   EllipsisVerticalIcon,
   PhotoIcon,
   ArrowLeftStartOnRectangleIcon,
+  TagIcon,
+  TrashIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  HashtagIcon,
 } from "@heroicons/vue/20/solid";
 import { useAuth } from "@/composables/useAuth";
 import ThemeDialog from "@/components/ThemeDialog.vue";
@@ -309,15 +449,22 @@ import { useProductsStore } from "@/stores/useProductsStore";
 import type { IProduct } from "@/types/Products";
 import { PencilSquareIcon } from "@heroicons/vue/24/solid";
 import IconMVRF from "@/components/icons/IconMVRF.vue";
+import type { ICategory } from "@/types/Categories";
+import { useCategoriesStore } from "@/stores/useCategoriesStore";
+import ThemeCombobox from "@/components/ThemeCombobox.vue";
 
 const { signOutUser } = useAuth();
 const productsDialog = ref<typeof ThemeDialog | null>(null);
+const categoriesDialog = ref<typeof ThemeDialog | null>(null);
 const productsStore = useProductsStore();
+const categoriesStore = useCategoriesStore();
+const categoryRemoveError = ref<boolean>(false);
 
 const productForm = ref<IProduct>({
   id: null,
   name: null,
   price: null,
+  category: null,
   image: null,
 });
 
@@ -325,6 +472,7 @@ const productFormValidationRules = computed(() => {
   return {
     name: { required },
     price: { required },
+    category: { required },
     image: { required },
   };
 });
@@ -334,7 +482,23 @@ const productFormValidation = useVuelidate(
   productForm,
 );
 
-async function saveDoc() {
+const categoryForm = ref<ICategory>({
+  id: null,
+  name: null,
+});
+
+const categoryFromValidationRules = computed(() => {
+  return {
+    name: { required },
+  };
+});
+
+const categoryFormValidation = useVuelidate(
+  categoryFromValidationRules,
+  categoryForm,
+);
+
+async function saveProduct() {
   await productFormValidation.value.$validate();
 
   if (!productFormValidation.value.$invalid) {
@@ -353,6 +517,7 @@ function loadEditData(product: IProduct) {
   productForm.value.id = product.id;
   productForm.value.name = product.name;
   productForm.value.price = product.price;
+  productForm.value.category = product.category;
   productForm.value.image = product.image;
 
   productsDialog.value?.openDialog();
@@ -429,6 +594,56 @@ function closeProductDialog() {
   productForm.value.id = null;
   productForm.value.image = null;
   productForm.value.name = null;
+  productForm.value.category = null;
   productForm.value.price = null;
+
+  productFormValidation.value.$reset();
+}
+
+function openCategoriesDialog() {
+  categoriesDialog.value?.openDialog();
+}
+
+function closeCategoriesDialog() {
+  categoryForm.value.id = null;
+  categoryForm.value.name = null;
+
+  categoryFormValidation.value.$reset();
+}
+
+async function saveCategory() {
+  await categoryFormValidation.value.$validate();
+  if (!categoryFormValidation.value.$invalid) {
+    if (!categoryForm.value.id) {
+      await categoriesStore.addCategory(categoryForm.value);
+    } else {
+      await categoriesStore.editCategory(
+        categoryForm.value.id,
+        categoryForm.value,
+      );
+    }
+    // after saving the category, reset the form
+    categoryForm.value.id = null;
+    categoryForm.value.name = null;
+  }
+}
+
+async function deleteCategory(category: ICategory) {
+  // check if there are products associated with category before deletion
+  if (!productsStore.countByCategory(category.id).value) {
+    if (category.id) {
+      await categoriesStore.deleteCategory(category.id);
+    }
+  } else {
+    categoryRemoveError.value = true;
+    setTimeout(() => {
+      categoryRemoveError.value = false;
+    }, 10000);
+  }
+}
+
+function loadCategoryEdit(category: ICategory) {
+  categoryForm.value.id = category.id;
+  categoryForm.value.name = category.name;
 }
 </script>

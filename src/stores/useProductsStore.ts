@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, onUnmounted } from "vue";
+import { ref, onUnmounted, computed } from "vue";
 import { db } from "@/utils/firebase"; // Assuming auth is not needed here
 import {
   collection,
@@ -11,10 +11,12 @@ import {
 } from "firebase/firestore";
 import type { Unsubscribe } from "firebase/firestore";
 import type { IProduct } from "@/types/Products";
+import type { ICategory } from "@/types/Categories";
 
 export const useProductsStore = defineStore("products", () => {
   const products = ref<IProduct[]>([]);
   const unsubscribe = ref<Unsubscribe | null>(null);
+  const categoryFilter = ref<ICategory>({ id: null, name: "All" });
 
   // Fetch documents and listen for real-time updates
   const fetchProducts = () => {
@@ -70,6 +72,46 @@ export const useProductsStore = defineStore("products", () => {
     }
   };
 
+  const countByCategory = (categoryId: string | null) => {
+    return computed(() => {
+      return products.value.filter(
+        (product) => product.category?.id === categoryId,
+      ).length;
+    });
+  };
+
+  const itemsByCategory = () => {
+    return computed<IProduct[]>(() => {
+      const productList = products.value || []; // Fallback to an empty array if products is null
+
+      let filteredProducts = productList;
+
+      // If there's a category filter, return the filtered products
+      if (categoryFilter.value?.id) {
+        filteredProducts = productList.filter(
+          (product) => product.category?.id === categoryFilter.value.id,
+        );
+      }
+
+      // Sort the filtered or all products alphabetically by name
+      return filteredProducts.sort((a, b) => {
+        const nameA = a.name?.toLowerCase() || ""; // Handle null names
+        const nameB = b.name?.toLowerCase() || ""; // Handle null names
+        return nameA.localeCompare(nameB);
+      });
+    });
+  };
+
+  const groupItemsByCategory = (category: ICategory) => {
+    return computed<IProduct[]>(() => {
+      const productList = products.value || []; // Fallback to an empty array if products is null
+
+      return productList.filter(
+        (product) => product.category?.id === category.id,
+      );
+    });
+  };
+
   // Initialize the store by fetching products
   fetchProducts();
 
@@ -82,8 +124,12 @@ export const useProductsStore = defineStore("products", () => {
 
   return {
     products,
+    categoryFilter,
     addProduct,
     editProduct,
     deleteProduct,
+    countByCategory,
+    itemsByCategory,
+    groupItemsByCategory,
   };
 });
