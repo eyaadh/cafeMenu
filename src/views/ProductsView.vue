@@ -74,6 +74,24 @@
 
                     <MenuItem v-slot="{ active }">
                       <RouterLink
+                        to="/reviewManagement"
+                        :class="[
+                          active
+                            ? 'bg-gray-100/80 text-gray-900'
+                            : 'text-white',
+                          'flex w-full items-center justify-start gap-2 border-b border-white/10 px-4 py-2 text-sm',
+                        ]"
+                      >
+                        <ChatBubbleBottomCenterTextIcon
+                          class="mb-1 h-4 w-4"
+                          aria-hidden="true"
+                        />
+                        <span class="drop-shadow">Review Management</span>
+                      </RouterLink>
+                    </MenuItem>
+
+                    <MenuItem v-slot="{ active }">
+                      <RouterLink
                         to="/"
                         :class="[
                           active
@@ -439,6 +457,7 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
   HashtagIcon,
+  ChatBubbleBottomCenterTextIcon,
 } from "@heroicons/vue/20/solid";
 import { useAuth } from "@/composables/useAuth";
 import ThemeDialog from "@/components/ThemeDialog.vue";

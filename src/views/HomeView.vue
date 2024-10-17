@@ -127,36 +127,7 @@
         </ul>
       </div>
 
-      <div
-        class="mt-20 flex w-full flex-col items-center justify-center gap-2 text-white/40"
-      >
-        <div class="flex items-center gap-4">
-          <a class="hover:text-white/80" href="tel:+9607940979">
-            <DevicePhoneMobileIcon class="mb-0.5 h-6" />
-          </a>
-          <a
-            class="hover:text-white/80"
-            href="https://maps.app.goo.gl/6okBsYqiZEkGUpHQA"
-          >
-            <MapIcon class="mb-0.5 h-6" />
-          </a>
-          <a
-            class="hover:text-white/80"
-            href="https://www.facebook.com/profile.php?id=100057313703827"
-          >
-            <IconFacebook class="mb-0.5 h-6" />
-          </a>
-          <a
-            class="hover:text-white/80"
-            href="https://invite.viber.com/?g2=AQBRG%2B0RR7iEwlObA5uowMwLproB0RQ%2Bv3AK87%2Bnbm2fZNZyFp168U9NukvDu2Ws"
-          >
-            <IconViber class="h-6" />
-          </a>
-        </div>
-        <span class="text-xs leading-6 tracking-wider">
-          Copyright © 2024 Cafe Breeze. All Rights Reserved.
-        </span>
-      </div>
+      <ThemeFooter :comments-option="true" />
     </div>
   </div>
 </template>
@@ -164,14 +135,7 @@
 <script setup lang="ts">
 import BrandLogo from "@/components/BrandLogo.vue";
 import { useProductsStore } from "@/stores/useProductsStore";
-import {
-  MapIcon,
-  DevicePhoneMobileIcon,
-  CheckIcon,
-  ChevronDownIcon,
-} from "@heroicons/vue/20/solid";
-import IconViber from "@/components/icons/IconViber.vue";
-import IconFacebook from "@/components/icons/IconFacebook.vue";
+import { CheckIcon, ChevronDownIcon } from "@heroicons/vue/20/solid";
 import IconMVRF from "@/components/icons/IconMVRF.vue";
 import {
   Listbox,
@@ -182,6 +146,7 @@ import {
 } from "@headlessui/vue";
 import { useCategoriesStore } from "@/stores/useCategoriesStore";
 import { computed } from "vue";
+import ThemeFooter from "@/components/ThemeFooter.vue";
 
 const productsStore = useProductsStore();
 const categoryStore = useCategoriesStore();

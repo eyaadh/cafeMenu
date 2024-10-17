@@ -16,9 +16,20 @@ const router = createRouter({
       component: () => import("../views/LoginView.vue"),
     },
     {
+      path: "/reviews",
+      name: "reviews",
+      component: () => import("../views/ReviewsView.vue"),
+    },
+    {
       path: "/products",
       name: "products",
       component: () => import("../views/ProductsView.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/reviewManagement",
+      name: "ReviewManagement",
+      component: () => import("../views/ReviewManagementView.vue"),
       meta: { requiresAuth: true },
     },
   ],
