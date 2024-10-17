@@ -10,7 +10,6 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import type { Unsubscribe } from "firebase/firestore";
-import type { IProduct } from "@/types/Products";
 import type { ICategory } from "@/types/Categories";
 
 export const useCategoriesStore = defineStore("categories", () => {
@@ -26,7 +25,7 @@ export const useCategoriesStore = defineStore("categories", () => {
         categories.value = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        })) as IProduct[]; // Cast to IProduct[]
+        })) as ICategory[];
       },
       (error) => {
         console.error("Error fetching category documents:", error);
