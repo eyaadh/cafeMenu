@@ -316,7 +316,7 @@ import ThemeDialog from "@/components/ThemeDialog.vue";
 import { computed, ref } from "vue";
 import { RadioGroup, RadioGroupOption } from "@headlessui/vue";
 import type { IReview } from "@/types/Reviews";
-import { required } from "@vuelidate/validators";
+import { required, email } from "@vuelidate/validators";
 import useVuelidate from "@vuelidate/core";
 import { CheckCircleIcon } from "@heroicons/vue/20/solid";
 import { useReviewsStore } from "@/stores/useReviewsStore";
@@ -346,12 +346,17 @@ const reviewFormValidationRules = computed(() => {
     rating: { required },
     content: { required },
     author: { required },
-    phoneNumber: { required },
-    email: { required },
+    phoneNumber: { required, phoneNumber: isValidPhoneNumber },
+    email: { required, email },
     status: { required },
     restricted: { required },
   };
 });
+
+const isValidPhoneNumber = (value: string) => {
+  const phoneRegex = /^\+?[0-9]{7,20}$/;
+  return phoneRegex.test(value);
+};
 
 const reviewFormValidation = useVuelidate(
   reviewFormValidationRules,
