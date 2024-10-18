@@ -20,13 +20,16 @@
     "@vuelidate/validators": "^2.0.4",
     "dayjs": "^1.11.13",
     "firebase": "^10.14.1",
+    "html2canvas": "^1.4.1",
     "pinia": "^2.2.4",
+    "qrcode": "^1.5.4",
     "vue": "^3.5.11",
     "vue-router": "^4.4.5"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
     "@types/node": "^20.16.11",
+    "@types/qrcode": "^1.5.5",
     "@vitejs/plugin-vue": "^5.1.4",
     "@vue/tsconfig": "^0.5.1",
     "autoprefixer": "^10.4.20",

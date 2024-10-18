@@ -71,7 +71,8 @@
                     </MenuItem>
 
                     <MenuItem v-slot="{ active }">
-                      <button
+                      <RouterLink
+                        to="/qr"
                         type="button"
                         :class="[
                           active
@@ -82,7 +83,7 @@
                       >
                         <QrCodeIcon class="mb-1 h-4 w-4" aria-hidden="true" />
                         <span class="drop-shadow">Show my QR</span>
-                      </button>
+                      </RouterLink>
                     </MenuItem>
 
                     <MenuItem v-slot="{ active }">

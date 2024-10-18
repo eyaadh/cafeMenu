@@ -32,6 +32,12 @@ const router = createRouter({
       component: () => import("../views/ReviewManagementView.vue"),
       meta: { requiresAuth: true },
     },
+    {
+      path: "/qr",
+      name: "QRManagement",
+      component: () => import("../views/QRManagementView.vue"),
+      meta: { requiresAuth: true },
+    },
   ],
 });
 
