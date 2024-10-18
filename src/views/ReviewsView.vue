@@ -205,6 +205,22 @@
           </div>
         </div>
 
+        <div class="col-span-full my-2 rounded-md bg-blue-50 p-4">
+          <div class="flex gap-2">
+            <div class="flex-shrink-0">
+              <InformationCircleIcon
+                class="h-5 w-5 text-blue-400"
+                aria-hidden="true"
+              />
+            </div>
+            <p class="text-sm leading-6 text-blue-700">
+              Your <strong>contact details</strong> are for internal use only in
+              case we need to contact you and
+              <strong>won't be shared publicly.</strong>
+            </p>
+          </div>
+        </div>
+
         <div class="col-span-full">
           <fieldset>
             <legend class="block text-sm font-medium leading-6 text-gray-900">
@@ -310,6 +326,7 @@ import {
   HomeIcon,
   StarIcon,
   ChatBubbleBottomCenterTextIcon,
+  InformationCircleIcon,
 } from "@heroicons/vue/20/solid";
 import ThemeFooter from "@/components/ThemeFooter.vue";
 import ThemeDialog from "@/components/ThemeDialog.vue";
