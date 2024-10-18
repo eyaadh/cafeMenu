@@ -17,7 +17,7 @@
         >
           <div
             ref="qrDiv"
-            class="relative isolate overflow-hidden rounded-md border border-white/50 bg-gray-900 px-2 pb-12 pt-2 shadow-md"
+            class="relative isolate overflow-hidden rounded-md border border-white/50 bg-gray-900 px-2 pb-16 pt-2 shadow-md"
           >
             <img
               v-if="!regeneratingQR"
@@ -50,8 +50,10 @@
                 </path>
               </svg>
             </div>
-            <div class="absolute bottom-0 -mx-2 w-full pb-1 text-center">
-              <h2 class="text-2xl font-bold uppercase drop-shadow">Scan Me</h2>
+            <div class="absolute bottom-0 -mx-2 w-full pb-2 text-center">
+              <h2 class="mb-2 text-2xl font-bold uppercase drop-shadow">
+                Scan Me
+              </h2>
             </div>
           </div>
 
@@ -165,7 +167,7 @@ async function share() {
 
   try {
     // Capture the div as an image
-    const canvas = await html2canvas(qrDiv.value);
+    const canvas = await html2canvas(qrDiv.value, { scale: 2 });
     const dataUrl: string = canvas.toDataURL("image/png");
 
     // Convert the data URL to a Blob
