@@ -160,13 +160,36 @@
             />
           </div>
         </div>
-        <div class="col-span-full">
+        <div>
           <ThemeCombobox
             label="Category"
             :items="categoriesStore.categories"
             :validation-error="productFormValidation.category.$error"
             v-model="productForm.category"
           />
+        </div>
+        <div>
+          <label
+            for="product-limit-per-order"
+            class="block text-sm font-medium leading-6 text-gray-900"
+          >
+            Limit Per Order
+          </label>
+          <div class="mt-2">
+            <input
+              v-model="productForm.limitPerOrder"
+              type="number"
+              name="product-limit-per-order"
+              id="product-limit-per-order"
+              :class="
+                productFormValidation.limitPerOrder.$error
+                  ? 'ring-red-300'
+                  : 'ring-gray-300'
+              "
+              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              placeholder="0"
+            />
+          </div>
         </div>
         <div class="col-span-full">
           <label
@@ -211,7 +234,7 @@
             <div v-else class="aspect-h-1 aspect-w-1">
               <label for="file-upload-masked">
                 <img
-                  class="w-full object-cover object-center"
+                  class="h-52 w-full object-cover object-center"
                   :alt="productForm.name ? productForm.name : 'image'"
                   :src="productForm.image ? productForm.image : ''"
                 />
@@ -381,6 +404,7 @@ const productForm = ref<IProduct>({
   price: null,
   category: null,
   image: null,
+  limitPerOrder: 5,
 });
 
 const productFormValidationRules = computed(() => {
@@ -389,6 +413,7 @@ const productFormValidationRules = computed(() => {
     price: { required },
     category: { required },
     image: { required },
+    limitPerOrder: { required },
   };
 });
 
@@ -434,6 +459,7 @@ function loadEditData(product: IProduct) {
   productForm.value.price = product.price;
   productForm.value.category = product.category;
   productForm.value.image = product.image;
+  productForm.value.limitPerOrder = product.limitPerOrder;
 
   productsDialog.value?.openDialog();
 }
@@ -511,6 +537,7 @@ function closeProductDialog() {
   productForm.value.name = null;
   productForm.value.category = null;
   productForm.value.price = null;
+  productForm.value.limitPerOrder = 5;
 
   productFormValidation.value.$reset();
 }

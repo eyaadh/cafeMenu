@@ -6,4 +6,5 @@ export interface IProduct {
   price: number | null;
   category: ICategory | null;
   image: string | null;
+  limitPerOrder: number | null;
 }
