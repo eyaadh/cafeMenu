@@ -58,7 +58,7 @@ export const useReviewsStore = defineStore("reviews", () => {
       await updateDoc(docRef, newData);
       console.log("Review updated successfully");
     } catch (error) {
-      console.error("Error updating product:", error);
+      console.error("Error updating review:", error);
     }
   };
 
@@ -69,7 +69,7 @@ export const useReviewsStore = defineStore("reviews", () => {
       await deleteDoc(docRef);
       console.log("Review deleted successfully");
     } catch (error) {
-      console.error("Error deleting product:", error);
+      console.error("Error deleting review:", error);
     }
   };
 
