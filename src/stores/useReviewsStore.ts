@@ -47,7 +47,7 @@ export const useReviewsStore = defineStore("reviews", () => {
 
       console.log(`Review added successfully with ID: ${docRef.id}`);
     } catch (error) {
-      console.error("Error adding product:", error);
+      console.error("Error adding review:", error);
     }
   };
 
