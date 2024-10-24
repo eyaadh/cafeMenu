@@ -1,7 +1,7 @@
 <template>
   <div class="h-screen w-full text-white">
     <div
-      class="animate-fade-up animate-duration-[900ms] animate-ease-linear animate-fill-both mx-auto flex h-full w-full max-w-3xl flex-col items-center justify-center"
+      class="mx-auto flex h-full w-full max-w-3xl animate-fade-up flex-col items-center justify-center animate-duration-[900ms] animate-fill-both animate-ease-linear"
     >
       <!--logo -->
       <div>
@@ -11,15 +11,26 @@
       <div
         class="mt-10 w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_55px,_black_calc(100%-55px),transparent_100%)] sm:overflow-auto sm:[mask-image:none] [&::-webkit-scrollbar]:hidden"
       >
-        <div class="flex w-full justify-end px-2">
+        <div
+          v-show="productsStore.itemsByCategory().value.length > 0"
+          class="flex w-full justify-end gap-2 px-2"
+        >
+          <RouterLink
+            to="/myOrders"
+            v-if="orderStore.myOrder"
+            class="inline-flex items-center rounded-md bg-white/5 px-2 py-1.5 hover:bg-white/10 focus:outline-none focus:ring-0"
+          >
+            <span class="sr-only">Filter by category</span>
+            <ShoppingBagIcon
+              class="mb-1 h-3 w-3 text-white"
+              aria-hidden="true"
+            />
+          </RouterLink>
           <Listbox as="div" v-model="productsStore.categoryFilter">
             <ListboxLabel class="sr-only">Filter by category</ListboxLabel>
-            <div
-              v-show="productsStore.itemsByCategory().value.length > 0"
-              class="relative"
-            >
+            <div class="relative">
               <div
-                class="animate-fade animate-duration-[900ms] animate-ease-linear animate-fill-both inline-flex divide-x divide-white/10 rounded-md shadow-sm"
+                class="inline-flex animate-fade divide-x divide-white/10 rounded-md shadow-sm animate-duration-[900ms] animate-fill-both animate-ease-linear"
               >
                 <div
                   class="inline-flex items-center gap-x-1.5 rounded-l-md bg-white/5 px-3 py-1.5 text-white shadow-sm"
@@ -98,6 +109,7 @@
             v-for="product in productsStore.itemsByCategory().value"
             :key="product.id ? product.id : new Date().getTime()"
             class="group relative w-36 flex-shrink-0 overflow-hidden rounded-md border border-white/10 py-4 shadow-md sm:w-auto sm:py-6"
+            @click="openOrderItemSelectionDialog(product)"
           >
             <div
               class="aspect-h-1 aspect-w-1 -mt-4 overflow-hidden bg-gray-200 group-hover:opacity-75 sm:-mt-6"
@@ -130,12 +142,126 @@
       <ThemeFooter :comments-option="true" />
     </div>
   </div>
+  <ThemeDialog
+    @dialog-close="closeOrderItemSelectionDialog"
+    :title="
+      selectedItemForm.itemSelected
+        ? (selectedItemForm.itemSelected.name as unknown as string)
+        : ''
+    "
+    ref="orderItemSelectionDialog"
+  >
+    <template #body>
+      <div class="aspect-1 w-full">
+        <img
+          alt="productImg"
+          :src="
+            selectedItemForm.itemSelected
+              ? (selectedItemForm.itemSelected.image as unknown as string)
+              : ''
+          "
+          class="w-full rounded-md object-cover"
+        />
+      </div>
+      <div class="mt-4 flex items-center justify-between border-b">
+        <div class="flex items-center gap-2">
+          <div
+            class="mb-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-gray-900 text-white"
+          >
+            <IconMVRF class="h-2" />
+          </div>
+          <p class="text-sm font-semibold">
+            Price:
+            {{
+              selectedItemForm.itemSelected
+                ? (selectedItemForm.itemSelected.price as unknown as string)
+                : ""
+            }}
+          </p>
+        </div>
+        <div class="mb-2 flex items-center gap-2">
+          <Listbox v-model="selectedItemForm.selectedQty" as="div">
+            <div class="relative mt-2">
+              <ListboxButton
+                :class="[
+                  selectedItemFormValidation.selectedQty.$error
+                    ? 'ring-red-300'
+                    : 'ring-gray-300',
+                  selectedItemForm.selectedQty ? 'w-16' : 'w-full',
+                ]"
+                class="relative cursor-default rounded-md bg-white py-1 pl-3 pr-8 text-left text-sm text-gray-900 shadow-sm ring-1 ring-inset focus:outline-none focus:ring-2 focus:ring-indigo-600"
+              >
+                <span class="mt-1 block truncate">
+                  {{ selectedItemForm.selectedQty || "Select Quantity" }}
+                </span>
+                <span
+                  class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
+                >
+                  <ChevronUpDownIcon
+                    class="mb-1 h-4 w-4 text-gray-400"
+                    aria-hidden="true"
+                  />
+                </span>
+              </ListboxButton>
+
+              <transition
+                leave-active-class="transition ease-in duration-100"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+              >
+                <ListboxOptions
+                  class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white/50 py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 backdrop-blur-sm focus:outline-none [&::-webkit-scrollbar]:hidden"
+                >
+                  <ListboxOption
+                    v-for="qty in quantityOptions"
+                    :key="qty"
+                    :value="qty"
+                    v-slot="{ active, selected }"
+                  >
+                    <li
+                      :class="[
+                        active ? 'bg-indigo-600 text-white' : 'text-gray-900',
+                        'relative cursor-default select-none py-2 pl-3 pr-9',
+                      ]"
+                    >
+                      <span
+                        :class="[
+                          selected ? 'font-semibold' : 'font-normal',
+                          'block truncate',
+                        ]"
+                      >
+                        {{ qty }}
+                      </span>
+                    </li>
+                  </ListboxOption>
+                </ListboxOptions>
+              </transition>
+            </div>
+          </Listbox>
+        </div>
+      </div>
+    </template>
+    <template #footer>
+      <button
+        @click="addToBag"
+        type="button"
+        class="col-span-full inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+      >
+        Add to bag
+      </button>
+    </template>
+  </ThemeDialog>
 </template>
 
 <script setup lang="ts">
 import BrandLogo from "@/components/BrandLogo.vue";
 import { useProductsStore } from "@/stores/useProductsStore";
-import { CheckIcon, ChevronDownIcon } from "@heroicons/vue/20/solid";
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpDownIcon,
+  ShoppingBagIcon,
+} from "@heroicons/vue/20/solid";
 import IconMVRF from "@/components/icons/IconMVRF.vue";
 import {
   Listbox,
@@ -145,13 +271,111 @@ import {
   ListboxOptions,
 } from "@headlessui/vue";
 import { useCategoriesStore } from "@/stores/useCategoriesStore";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import ThemeFooter from "@/components/ThemeFooter.vue";
+import ThemeDialog from "@/components/ThemeDialog.vue";
+import type { IProduct } from "@/types/Products";
+import { required, numeric } from "@vuelidate/validators";
+import useVuelidate from "@vuelidate/core";
+import { useOrdersStore } from "@/stores/useOrdersStore";
+import type { IOrderItem } from "@/types/Orders";
 
 const productsStore = useProductsStore();
 const categoryStore = useCategoriesStore();
+const orderItemSelectionDialog = ref<typeof ThemeDialog | null>(null);
+const orderStore = useOrdersStore();
+
+interface ISelectedItemForm {
+  itemSelected: IProduct | null;
+  selectedQty: number | null;
+}
+
+const selectedItemForm = ref<ISelectedItemForm>({
+  itemSelected: null,
+  selectedQty: null,
+});
+
+const selectedItemFormValidationRules = computed(() => {
+  return {
+    itemSelected: { required },
+    selectedQty: { required, numeric },
+  };
+});
+
+const selectedItemFormValidation = useVuelidate(
+  selectedItemFormValidationRules,
+  selectedItemForm,
+);
+
+async function addToBag() {
+  await selectedItemFormValidation.value.$validate();
+  if (!selectedItemFormValidation.value.$invalid) {
+    const itemSelected = selectedItemForm.value.itemSelected;
+    const selectedQty = selectedItemForm.value.selectedQty;
+
+    if (itemSelected && selectedQty !== null) {
+      const orderItem: IOrderItem = {
+        item: itemSelected,
+        qty: selectedQty,
+        total: itemSelected.price ? itemSelected.price * selectedQty : null,
+      };
+
+      // Check if there is an existing order in myOrder, if not, create a new order
+      if (!orderStore.myOrder) {
+        orderStore.myOrder = {
+          items: [],
+          total: 0,
+          comment: null,
+          contactNumber: null,
+          address: null,
+          status: "pending",
+          restricted: false,
+        };
+      }
+
+      // Add the new item to the order's items array
+      orderStore.myOrder.items.push(orderItem);
+
+      // Update the total for the order
+      orderStore.myOrder.total = orderStore.myOrder.items.reduce(
+        (acc: number, item: IOrderItem) => {
+          const itemTotal = item.total ?? 0; // Ensure item.total is a number, defaulting to 0
+          return acc + itemTotal;
+        },
+        0,
+      );
+
+      // finally close the dialog
+      orderItemSelectionDialog.value?.closeDialog();
+    }
+  }
+}
+
+function openOrderItemSelectionDialog(product: IProduct) {
+  selectedItemForm.value.itemSelected = product;
+  orderItemSelectionDialog.value?.openDialog();
+}
+
+function closeOrderItemSelectionDialog() {
+  selectedItemForm.value.selectedQty = null;
+  selectedItemForm.value.itemSelected = null;
+
+  selectedItemFormValidation.value.$reset();
+}
 
 const categoriesFilterOptions = computed(() => {
   return [{ id: null, name: "All" }, ...categoryStore.categories];
+});
+
+const quantityOptions = computed(() => {
+  if (
+    !selectedItemForm.value.itemSelected ||
+    !selectedItemForm.value.itemSelected.limitPerOrder
+  )
+    return [];
+  return Array.from(
+    { length: selectedItemForm.value.itemSelected.limitPerOrder },
+    (_, i) => i + 1,
+  );
 });
 </script>

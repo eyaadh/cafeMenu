@@ -21,6 +21,11 @@ const router = createRouter({
       component: () => import("../views/ReviewsView.vue"),
     },
     {
+      path: "/myOrders",
+      name: "MyOrders",
+      component: () => import("../views/MyOrdersView.vue"),
+    },
+    {
       path: "/products",
       name: "products",
       component: () => import("../views/ProductsView.vue"),
@@ -36,6 +41,12 @@ const router = createRouter({
       path: "/qr",
       name: "QRManagement",
       component: () => import("../views/QRManagementView.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/ordersManagement",
+      name: "OrdersManagement",
+      component: () => import("../views/OrderManagementView.vue"),
       meta: { requiresAuth: true },
     },
   ],

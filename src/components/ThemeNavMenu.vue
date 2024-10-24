@@ -55,6 +55,22 @@
               </RouterLink>
             </MenuItem>
 
+            <MenuItem
+              v-if="route.path !== '/ordersManagement'"
+              v-slot="{ active }"
+            >
+              <RouterLink
+                to="/ordersManagement"
+                :class="[
+                  active ? 'bg-gray-100/80 text-gray-900' : 'text-white',
+                  'flex w-full items-center justify-start gap-2 px-4 py-2 text-sm',
+                ]"
+              >
+                <ShoppingBagIcon class="mb-1 h-4 w-4" aria-hidden="true" />
+                <span class="drop-shadow">Orders Management</span>
+              </RouterLink>
+            </MenuItem>
+
             <MenuItem v-slot="{ active }">
               <RouterLink
                 to="/"
@@ -113,6 +129,7 @@ import {
   HomeIcon,
   QrCodeIcon,
   ShoppingCartIcon,
+  ShoppingBagIcon,
 } from "@heroicons/vue/20/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { useAuth } from "@/composables/useAuth";
