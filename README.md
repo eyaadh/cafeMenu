@@ -22,6 +22,60 @@ VITE_LOCAL_BOT_TOKEN=your-telegram-bot-token
 VITE_TELEGRAM_GROUP_ID=your-telegram-group-id
 ```
 
+### Firestore Security Rules
+
+The following security rules for Firestore are in place for this project, ensuring the appropriate permissions for reading, writing, and updating data in Firestore:
+
+```javascript
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /products/{docId} {
+      // Allow anyone to read product documents
+      allow read: if true;
+
+      // Only authenticated users can create, update, or delete products
+      allow create, update, delete: if request.auth != null;
+    }
+    match /categories/{docId} {
+      // Allow anyone to read category documents
+      allow read: if true;
+
+      // Only authenticated users can create, update, or delete categories
+      allow create, update, delete: if request.auth != null;
+    }
+    match /reviews/{docId} {
+      // Allow anyone to read and create reviews
+      allow read, create: if true;
+
+      // Allow updates if "restricted" is false or if the user is authenticated
+      allow update: if resource.data.restricted != true || request.auth != null;
+
+      // Only authenticated users can delete reviews
+      allow delete: if request.auth != null;
+    }
+    match /orders/{docId} {
+      // Only authenticated users can read orders
+      allow read: if request.auth != null;
+
+      // Anyone can create an order
+      allow create: if true;
+
+      // Allow updates if 'restricted' is false, or only authenticated users can update when 'restricted' is true
+      allow update: if resource.data.restricted == false || (request.auth != null && resource.data.restricted == true);
+
+      // Only authenticated users can delete orders
+      allow delete: if request.auth != null;
+    }
+    match /systemSettings/{docId} {
+      // Only authenticated users can access system settings
+      allow read, create, update, delete: if request.auth != null;
+    }
+  }
+}
+```
+
 The application is hosted on **Cloudflare Pages**: [Live Demo](https://cafemenu.pages.dev/)
 
 ## Key Dependencies
