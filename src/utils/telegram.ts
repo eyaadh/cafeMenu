@@ -34,6 +34,7 @@ export async function sendOrderMessage(
   newOrder: Boolean = true,
 ) {
   const token = import.meta.env.VITE_LOCAL_BOT_TOKEN as string;
+  const chatId = import.meta.env.VITE_TELEGRAM_GROUP_ID as number;
   const apiUrl = `https://api.telegram.org/bot${token}/sendMessage`;
 
   try {
@@ -46,7 +47,7 @@ export async function sendOrderMessage(
 
     // Send the message using axios
     const response = await axios.post(apiUrl, {
-      chat_id: -1002379066799, // Your chat ID
+      chat_id: chatId, // Your chat ID
       text: `${messageHeader}${formattedMessage}`,
       parse_mode: "HTML",
     });
