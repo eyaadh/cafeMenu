@@ -312,7 +312,6 @@ import { required, minValue } from "@vuelidate/validators";
 import ThemeFooter from "@/components/ThemeFooter.vue";
 import ThemeDialog from "@/components/ThemeDialog.vue";
 import { useRouter } from "vue-router";
-import { sendOrderMessage } from "@/utils/telegram";
 
 const ordersStore = useOrdersStore();
 const { myOrder } = ordersStore;
@@ -386,13 +385,11 @@ async function checkoutOrder() {
   if (!orderValidation.value.$invalid) {
     // 1. save the order to DB
     await ordersStore.addOrder(myOrder);
-    // 2. notify in tg group
-    await sendOrderMessage(ordersStore.myOrder);
-    // 3. show feedback to the user
+    // 2. show feedback to the user
     orderConfirmationDialog.value?.openDialog();
-    // 4. clear my order
+    // 3. clear my order
     ordersStore.myOrder = null;
-    // 5. after 4 secs close the dialog
+    // 4. after 4 secs close the dialog
     setTimeout(() => {
       orderConfirmationDialog.value?.closeDialog();
     }, 4000);

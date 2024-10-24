@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import type { Unsubscribe } from "firebase/firestore";
 import { useAuth } from "@/composables/useAuth";
+import { sendOrderMessage } from "@/utils/telegram";
 
 export const useOrdersStore = defineStore("orders", () => {
   const myOrder = useStorage("myOrder", null as IOrder | null, localStorage, {
@@ -50,6 +51,10 @@ export const useOrdersStore = defineStore("orders", () => {
 
       // finally update the doc restriction
       await updateDoc(doc(db, "orders", docRef.id), { restricted: true });
+
+      newOrder.id = docRef.id;
+
+      await sendOrderMessage(newOrder);
 
       console.log(`Order added successfully with ID: ${docRef.id}`);
     } catch (error) {
