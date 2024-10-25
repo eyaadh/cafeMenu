@@ -80,69 +80,44 @@
                     </div>
 
                     <div
-                      class="flex items-center sm:absolute sm:left-1/2 sm:top-0 sm:mt-0 sm:block"
+                      class="flex items-start justify-between sm:absolute sm:left-1/2 sm:top-0 sm:mt-0 sm:block"
                     >
-                      <Listbox v-model="item.qty" as="div">
-                        <div class="relative">
-                          <ListboxButton
-                            :class="[item.qty ? 'w-16' : 'w-full']"
-                            class="relative cursor-default rounded-md border-0 bg-white bg-white/5 py-0.5 pl-3 pr-8 text-left text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-white/10"
+                      <div>
+                        <label
+                          for="quantity"
+                          class="block text-sm font-medium leading-6 text-white/80"
+                        >
+                          Quantity
+                        </label>
+                        <div class="relative mt-2 rounded-md shadow-sm">
+                          <button
+                            class="absolute left-2 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-md text-white ring-1 ring-inset ring-white/10 sm:text-sm"
+                            @click="stepDownQty(item)"
                           >
-                            <span class="mt-1 block truncate">
-                              {{ item.qty || "Select Quantity" }}
-                            </span>
-                            <span
-                              class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
-                            >
-                              <ChevronUpDownIcon
-                                class="mb-1 h-4 w-4 text-gray-400"
-                                aria-hidden="true"
-                              />
-                            </span>
-                          </ListboxButton>
-
-                          <transition
-                            leave-active-class="transition ease-in duration-100"
-                            leave-from-class="opacity-100"
-                            leave-to-class="opacity-0"
+                            <MinusIcon class="h-4 w-4 shrink-0" />
+                          </button>
+                          <input
+                            type="number"
+                            name="quantity"
+                            id="quantity"
+                            :disabled="true"
+                            v-model="item.qty"
+                            class="block w-28 rounded-md border-0 bg-white/5 py-1.5 pb-1 pl-10 pr-10 text-center text-sm font-semibold text-white ring-1 ring-inset ring-white/10 placeholder:text-white/40 focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+                            placeholder="10"
+                            aria-describedby="price-currency"
+                          />
+                          <button
+                            class="absolute right-2 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-md text-white ring-1 ring-inset ring-white/10 sm:text-sm"
+                            @click="stepUpQty(item)"
                           >
-                            <ListboxOptions
-                              class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white/50 py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 backdrop-blur-sm focus:outline-none [&::-webkit-scrollbar]:hidden"
-                            >
-                              <ListboxOption
-                                v-for="qty in calculateQty(item.item)"
-                                :key="qty"
-                                :value="qty"
-                                v-slot="{ active, selected }"
-                              >
-                                <li
-                                  :class="[
-                                    active
-                                      ? 'bg-white/50 text-gray-900'
-                                      : 'text-gray-900',
-                                    'relative cursor-default select-none py-2 pl-3 pr-9',
-                                  ]"
-                                >
-                                  <span
-                                    :class="[
-                                      selected
-                                        ? 'font-semibold'
-                                        : 'font-normal',
-                                      'block truncate',
-                                    ]"
-                                  >
-                                    {{ qty }}
-                                  </span>
-                                </li>
-                              </ListboxOption>
-                            </ListboxOptions>
-                          </transition>
+                            <PlusIcon class="h-4 w-4 shrink-0" />
+                          </button>
                         </div>
-                      </Listbox>
+                      </div>
 
                       <button
                         type="button"
-                        class="ml-4 text-sm font-medium text-white/50 hover:text-white/80 sm:ml-0"
+                        class="ml-4 mt-4 text-sm font-medium text-white/50 hover:text-white/80 sm:ml-0"
                         @click="removeItemFromOrder(item)"
                       >
                         <span>Remove</span>
@@ -294,17 +269,11 @@ import BrandLogo from "@/components/BrandLogo.vue";
 import { useOrdersStore } from "@/stores/useOrdersStore";
 import IconMVRF from "@/components/icons/IconMVRF.vue";
 import {
-  Listbox,
-  ListboxButton,
-  ListboxOption,
-  ListboxOptions,
-} from "@headlessui/vue";
-import {
-  ChevronUpDownIcon,
+  PlusIcon,
+  MinusIcon,
   HomeIcon,
   CheckCircleIcon,
 } from "@heroicons/vue/20/solid";
-import type { IProduct } from "@/types/Products";
 import { computed, ref, watch } from "vue";
 import type { IOrder, IOrderItem } from "@/types/Orders";
 import useVuelidate from "@vuelidate/core";
@@ -318,9 +287,28 @@ const { myOrder } = ordersStore;
 const orderConfirmationDialog = ref<typeof ThemeDialog | null>(null);
 const router = useRouter();
 
-function calculateQty(product: IProduct) {
-  if (!product.limitPerOrder) return [];
-  return Array.from({ length: product.limitPerOrder }, (_, i) => i + 1);
+function stepDownQty(item: IOrderItem) {
+  const itemIdx = (myOrder as IOrder).items.findIndex(
+    (i) => i.item.id === item.item.id,
+  );
+
+  if (itemIdx !== -1) {
+    if (item.qty !== 1) {
+      myOrder.items[itemIdx].qty -= 1;
+    }
+  }
+}
+
+function stepUpQty(item: IOrderItem) {
+  const itemIdx = (myOrder as IOrder).items.findIndex(
+    (i) => i.item.id === item.item.id,
+  );
+
+  if (itemIdx !== -1) {
+    if (item.qty !== item.item.limitPerOrder) {
+      myOrder.items[itemIdx].qty += 1;
+    }
+  }
 }
 
 function removeItemFromOrder(item: IOrderItem) {

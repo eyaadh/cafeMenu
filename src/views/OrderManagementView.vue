@@ -173,64 +173,33 @@
                     Total: MRF {{ item.total?.toFixed(2) }}
                   </p>
                 </div>
-                <div class="ml-4">
-                  <Listbox v-model="item.qty" as="div">
-                    <div class="relative">
-                      <ListboxButton
-                        :class="[item.qty ? 'w-16' : 'w-full']"
-                        class="relative cursor-default rounded-md border border-gray-300 py-0.5 pl-3 pr-8 text-left text-base font-medium text-gray-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
+                <div class="ml-4 flex flex-col items-end justify-between">
+                  <div>
+                    <div class="relative rounded-md shadow-sm">
+                      <button
+                        class="absolute left-2 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-md text-gray-500 ring-1 ring-inset ring-gray-300 sm:text-sm"
+                        @click="stepDownQty(item)"
                       >
-                        <span class="mt-1 block truncate">
-                          {{ item.qty || "Select Quantity" }}
-                        </span>
-                        <span
-                          class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
-                        >
-                          <ChevronUpDownIcon
-                            class="mb-1 h-4 w-4 text-gray-400"
-                            aria-hidden="true"
-                          />
-                        </span>
-                      </ListboxButton>
-
-                      <transition
-                        leave-active-class="transition ease-in duration-100"
-                        leave-from-class="opacity-100"
-                        leave-to-class="opacity-0"
+                        <MinusIcon class="h-4 w-4 shrink-0" />
+                      </button>
+                      <input
+                        type="number"
+                        name="quantity"
+                        id="quantity"
+                        :disabled="true"
+                        v-model="item.qty"
+                        class="block w-28 rounded-md border-0 bg-white/5 py-1.5 pb-1 pl-10 pr-10 text-center text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-white/40 focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+                        placeholder="10"
+                        aria-describedby="price-currency"
+                      />
+                      <button
+                        class="absolute right-2 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-md text-gray-500 ring-1 ring-inset ring-gray-300 sm:text-sm"
+                        @click="stepUpQty(item)"
                       >
-                        <ListboxOptions
-                          class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white/50 py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 backdrop-blur-sm focus:outline-none [&::-webkit-scrollbar]:hidden"
-                        >
-                          <ListboxOption
-                            v-for="qty in calculateQty(item.item)"
-                            :key="qty"
-                            :value="qty"
-                            v-slot="{ active, selected }"
-                          >
-                            <li
-                              :class="[
-                                active
-                                  ? 'bg-indigo-600 text-white'
-                                  : 'text-gray-900',
-                                'relative cursor-default select-none py-2 pl-3 pr-9',
-                              ]"
-                            >
-                              <span
-                                :class="[
-                                  selected ? 'font-semibold' : 'font-normal',
-                                  'block truncate',
-                                ]"
-                              >
-                                {{ qty }}
-                              </span>
-                            </li>
-                          </ListboxOption>
-                        </ListboxOptions>
-                      </transition>
+                        <PlusIcon class="h-4 w-4 shrink-0" />
+                      </button>
                     </div>
-                  </Listbox>
-                </div>
-                <div class="ml-4 flow-root flex-shrink-0">
+                  </div>
                   <button
                     type="button"
                     class="-m-2.5 flex items-center justify-center bg-white p-2.5 text-sm text-gray-400 hover:text-gray-500"
@@ -409,12 +378,14 @@ import { useOrdersStore } from "@/stores/useOrdersStore";
 import {
   ChatBubbleBottomCenterTextIcon,
   ChevronUpDownIcon,
+  MinusIcon,
   PencilSquareIcon,
+  PlusIcon,
 } from "@heroicons/vue/20/solid";
 import { computed, onMounted, ref, watch } from "vue";
 import type { IOrder, IOrderItem } from "@/types/Orders";
 import ThemeDialog from "@/components/ThemeDialog.vue";
-import type { IProduct } from "@/types/Products";
+
 import {
   Listbox,
   ListboxButton,
@@ -447,9 +418,32 @@ function closeOrderManagementDialog() {
   selectedOrder.value = null;
 }
 
-function calculateQty(product: IProduct) {
-  if (!product.limitPerOrder) return [];
-  return Array.from({ length: product.limitPerOrder }, (_, i) => i + 1);
+function stepDownQty(item: IOrderItem) {
+  const itemIdx = selectedOrder.value?.items.findIndex(
+    (i) => i.item.id === item.item.id,
+  );
+
+  if (itemIdx !== undefined && itemIdx !== -1 && selectedOrder.value) {
+    const currentQty = selectedOrder.value.items[itemIdx].qty ?? 1; // default to 1 if null
+    if (currentQty > 1) {
+      selectedOrder.value.items[itemIdx].qty = currentQty - 1;
+    }
+  }
+}
+
+function stepUpQty(item: IOrderItem) {
+  const itemIdx = selectedOrder.value?.items.findIndex(
+    (i) => i.item.id === item.item.id,
+  );
+
+  if (itemIdx !== undefined && itemIdx !== -1 && selectedOrder.value) {
+    const currentQty = selectedOrder.value.items[itemIdx].qty ?? 1; // default to 1 if null
+    const limitPerOrder = item.item.limitPerOrder ?? Infinity; // no limit if undefined
+
+    if (currentQty < limitPerOrder) {
+      selectedOrder.value.items[itemIdx].qty = currentQty + 1;
+    }
+  }
 }
 
 function removeItemFromOrder(item: IOrderItem) {
